@@ -4014,6 +4014,7 @@ bind .   <$M1B-Key-Return> do_commit
 bind .   <$M1B-Key-KP_Enter> do_commit
 foreach i [list $ui_index $ui_workdir] {
 	bind $i <Button-1>       { toggle_or_diff click %W %x %y; break }
+	bind $i <Double-1>       { toggle_or_diff toggle %W %x %y; break }
 	bind $i <$M1B-Button-1>  { add_one_to_selection %W %x %y; break }
 	bind $i <Shift-Button-1> { add_range_to_selection %W %x %y; break }
 	bind $i <Key-Up>         { toggle_or_diff up %W; break }
