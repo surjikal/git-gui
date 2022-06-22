@@ -739,7 +739,12 @@ proc rmsel_tag {text} {
 	return $text
 }
 
-wm withdraw .
+# Causes git-gui to crash on macOS 13 beta
+# when opening it from within a repository directory
+if {![is_MacOSX]} {
+	wm withdraw .
+}
+
 set root_exists 0
 bind . <Visibility> {
 	bind . <Visibility> {}
