@@ -3400,8 +3400,11 @@ if {![is_enabled nocommitmsg]} {
 	pack .vpane.lower.commarea.buttons.signoff -side top -fill x
 }
 
-${NS}::button .vpane.lower.commarea.buttons.commit -text [commit_btn_caption] \
+${NS}::button .vpane.lower.commarea.buttons.commit \
+	-text [commit_btn_caption] \
+	-default active \
 	-command do_commit
+
 pack .vpane.lower.commarea.buttons.commit -side top -fill x
 lappend disable_on_lock \
 	{.vpane.lower.commarea.buttons.commit conf -state}
