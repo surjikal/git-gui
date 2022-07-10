@@ -2725,6 +2725,14 @@ proc focus_widget {widget} {
 	}
 }
 
+proc hotkey_apply_or_revert_lines {revert} {
+	global ui_diff
+	set selected [$ui_diff tag nextrange sel 0.0]
+	if {$selected != {}} {
+		apply_or_revert_range_or_line 0 0 $revert
+	}
+}
+
 proc toggle_display_untracked {} {
 	global display_untracked
 	if {$display_untracked} {
@@ -3996,8 +4004,12 @@ bind $ui_diff <$M1B-Key-v> {break}
 bind $ui_diff <$M1B-Key-V> {break}
 bind $ui_diff <$M1B-Key-a> {%W tag add sel 0.0 end;break}
 bind $ui_diff <$M1B-Key-A> {%W tag add sel 0.0 end;break}
-bind $ui_diff <$M1B-Key-j> {do_revert_selection;break}
-bind $ui_diff <$M1B-Key-J> {do_revert_selection;break}
+bind $ui_diff <$M1B-Key-j> {hotkey_apply_or_revert_lines 1; do_rescan;break}
+bind $ui_diff <$M1B-Key-J> {hotkey_apply_or_revert_lines 1; do_rescan;break}
+bind $ui_diff <$M1B-Key-u> {hotkey_apply_or_revert_lines 0; do_rescan;break}
+bind $ui_diff <$M1B-Key-U> {hotkey_apply_or_revert_lines 0; do_rescan;break}
+bind $ui_diff <$M1B-Key-t> {hotkey_apply_or_revert_lines 0; do_rescan;break}
+bind $ui_diff <$M1B-Key-T> {hotkey_apply_or_revert_lines 0; do_rescan;break}
 bind $ui_diff <Key-Up>     {catch {%W yview scroll -1 units};break}
 bind $ui_diff <Key-Down>   {catch {%W yview scroll  1 units};break}
 bind $ui_diff <Key-Left>   {catch {%W xview scroll -1 units};break}
@@ -4026,8 +4038,8 @@ if {[is_enabled transport]} {
 bind .   <Key-F5>     ui_do_rescan
 bind .   <$M1B-Key-r> ui_do_rescan
 bind .   <$M1B-Key-R> ui_do_rescan
-bind .   <$M1B-Key-s> do_signoff
-bind .   <$M1B-Key-S> do_signoff
+# bind .   <$M1B-Key-s> do_signoff
+# bind .   <$M1B-Key-S> do_signoff
 bind .   <$M1B-Key-t> { toggle_or_diff toggle %W }
 bind .   <$M1B-Key-T> { toggle_or_diff toggle %W }
 bind .   <$M1B-Key-u> { toggle_or_diff toggle %W }
@@ -4049,7 +4061,6 @@ bind .   <$M1B-Key-Return> do_commit
 bind .   <$M1B-Key-KP_Enter> do_commit
 foreach i [list $ui_index $ui_workdir] {
 	bind $i <Button-1>       { toggle_or_diff click %W %x %y; break }
-	bind $i <Double-1>       { toggle_or_diff toggle %W %x %y; break }
 	bind $i <$M1B-Button-1>  { add_one_to_selection %W %x %y; break }
 	bind $i <Shift-Button-1> { add_range_to_selection %W %x %y; break }
 	bind $i <Key-Up>         { toggle_or_diff up %W; break }
