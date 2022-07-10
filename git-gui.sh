@@ -2728,7 +2728,11 @@ proc focus_widget {widget} {
 proc hotkey_apply_or_revert_lines {revert} {
 	global ui_diff
 	set selected [$ui_diff tag nextrange sel 0.0]
-	if {$selected != {}} {
+	if {$selected == {}} {
+		if {$revert} {
+			do_revert_selection
+		}
+	} else {
 		apply_or_revert_range_or_line 0 0 $revert
 	}
 }
@@ -3284,26 +3288,43 @@ default {
 }
 }
 
-# -- Branch Control
+# -- Header Control
 #
-${NS}::frame .branch
-# if {!$use_ttk} {.branch configure -borderwidth 1 -relief sunken}
-${NS}::label .branch.cb \
+${NS}::frame .header
+if {!$use_ttk} {.header configure -borderwidth 1 -relief sunken}
+${NS}::label .header.cb \
 	-textvariable current_branch \
 	-anchor w \
 	-justify right
 
-${NS}::checkbutton .branch.r1 \
+${NS}::frame .header.buttons
+
+${NS}::button .header.buttons.rescan -text [mc Rescan] \
+	-command ui_do_rescan
+pack .header.buttons.rescan -side top -fill x
+lappend disable_on_lock \
+	{.header.buttons.rescan conf -state}
+
+${NS}::button .header.buttons.incall -text [mc "Stage Changed"] \
+	-command do_add_all
+pack .header.buttons.incall -side top -fill x
+lappend disable_on_lock \
+	{.header.buttons.incall conf -state}
+
+${NS}::checkbutton .header.buttons.untracked \
 	-text [mc "Display Untracked"] \
 	-variable display_untracked \
 	-command toggle_display_untracked
-lappend disable_on_lock \
-	[list .branch.r1 conf -state]
 
-# pack .branch.l1 -side right
-pack .branch.r1 -side left -fill x
-pack .branch.cb -side right -fill x
-pack .branch -side top -fill x -padx 8 -pady 8
+lappend disable_on_lock \
+	[list .header.buttons.untracked conf -state]
+
+pack .header.buttons -side left -fill x
+pack .header.buttons.rescan -side left -fill x -padx 7
+pack .header.buttons.incall -side left -fill x -padx 7
+pack .header.buttons.untracked -side left -fill x -padx 7
+pack .header.cb -side right -fill x
+pack .header -side top -fill x -padx 7 -pady 7
 
 # -- Main Window Layout
 #
@@ -3419,18 +3440,6 @@ ${NS}::label .vpane.lower.commarea.buttons.l -text {} \
 	-justify left
 pack .vpane.lower.commarea.buttons.l -side top -fill x
 pack .vpane.lower.commarea.buttons -side left -fill y
-
-${NS}::button .vpane.lower.commarea.buttons.rescan -text [mc Rescan] \
-	-command ui_do_rescan
-pack .vpane.lower.commarea.buttons.rescan -side top -fill x
-lappend disable_on_lock \
-	{.vpane.lower.commarea.buttons.rescan conf -state}
-
-${NS}::button .vpane.lower.commarea.buttons.incall -text [mc "Stage Changed"] \
-	-command do_add_all
-pack .vpane.lower.commarea.buttons.incall -side top -fill x
-lappend disable_on_lock \
-	{.vpane.lower.commarea.buttons.incall conf -state}
 
 if {![is_enabled nocommitmsg]} {
 	${NS}::button .vpane.lower.commarea.buttons.signoff -text [mc "Sign Off"] \
