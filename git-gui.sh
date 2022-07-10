@@ -3448,7 +3448,7 @@ trace add variable commit_type write trace_commit_type
 pack $ui_coml -side left -fill x
 
 if {![is_enabled nocommit]} {
-	pack .vpane.lower.commarea.buffer.header.amend -side right
+	pack .vpane.lower.commarea.buffer.header.amend -side right -padx 7
 }
 
 textframe .vpane.lower.commarea.buffer.frame
@@ -3476,7 +3476,7 @@ pack .vpane.lower.commarea.buffer.frame.sby -side right -fill y
 pack $ui_comm -side left -fill y
 pack .vpane.lower.commarea.buffer.header -side top -fill x
 pack .vpane.lower.commarea.buffer.frame -side left -fill y
-pack .vpane.lower.commarea.buffer -side left -fill y
+pack .vpane.lower.commarea.buffer -side left -fill y -padx 7 -pady 0
 
 # -- Commit Message Buffer Context Menu
 #
