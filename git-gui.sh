@@ -291,6 +291,19 @@ set _githtmldir {}
 set _reponame {}
 set _shellpath {@@SHELL_PATH@@}
 
+
+# variables for theming
+set color_green        {#49D86D}
+set color_purple       {#4a405c}
+set color_blue         {#C4A9F4}
+set color_red          {#FF6E67}
+set color_cyan         {#9AEDFD}
+set color_cyan_bright  {#E2EFFA}
+set color_green_bright {#88F397}
+set color_grey         {#333333}
+set color_black        {#000000}
+
+
 set _trace [lsearch -exact $argv --trace]
 if {$_trace >= 0} {
 	set argv [lreplace $argv $_trace $_trace]
@@ -2026,7 +2039,7 @@ static unsigned char mask_bits[] = {
 	0xfe, 0x1f, 0xfe, 0x1f, 0xfe, 0x1f};
 }
 
-image create bitmap file_plain -background white -foreground black -data {
+image create bitmap file_plain -background white -foreground $color_black -data {
 #define plain_width 14
 #define plain_height 15
 static unsigned char plain_bits[] = {
@@ -2035,7 +2048,7 @@ static unsigned char plain_bits[] = {
 	0x02, 0x10, 0x02, 0x10, 0xfe, 0x1f};
 } -maskdata $filemask
 
-image create bitmap file_mod -background white -foreground blue -data {
+image create bitmap file_mod -background white -foreground $color_cyan -data {
 #define mod_width 14
 #define mod_height 15
 static unsigned char mod_bits[] = {
@@ -2044,7 +2057,7 @@ static unsigned char mod_bits[] = {
 	0xfa, 0x17, 0x02, 0x10, 0xfe, 0x1f};
 } -maskdata $filemask
 
-image create bitmap file_fulltick -background white -foreground "#007000" -data {
+image create bitmap file_fulltick -background white -foreground $color_green -data {
 #define file_fulltick_width 14
 #define file_fulltick_height 15
 static unsigned char file_fulltick_bits[] = {
@@ -2053,7 +2066,7 @@ static unsigned char file_fulltick_bits[] = {
 	0x62, 0x10, 0x02, 0x10, 0xfe, 0x1f};
 } -maskdata $filemask
 
-image create bitmap file_question -background white -foreground black -data {
+image create bitmap file_question -background white -foreground $color_red -data {
 #define file_question_width 14
 #define file_question_height 15
 static unsigned char file_question_bits[] = {
@@ -2062,7 +2075,7 @@ static unsigned char file_question_bits[] = {
 	0x62, 0x10, 0x02, 0x10, 0xfe, 0x1f};
 } -maskdata $filemask
 
-image create bitmap file_removed -background white -foreground red -data {
+image create bitmap file_removed -background white -foreground $color_red -data {
 #define file_removed_width 14
 #define file_removed_height 15
 static unsigned char file_removed_bits[] = {
@@ -2071,7 +2084,7 @@ static unsigned char file_removed_bits[] = {
 	0x1a, 0x16, 0x02, 0x10, 0xfe, 0x1f};
 } -maskdata $filemask
 
-image create bitmap file_merge -background white -foreground blue -data {
+image create bitmap file_merge -background white -foreground $color_blue -data {
 #define file_merge_width 14
 #define file_merge_height 15
 static unsigned char file_merge_bits[] = {
@@ -2080,7 +2093,7 @@ static unsigned char file_merge_bits[] = {
 	0xfa, 0x17, 0x02, 0x10, 0xfe, 0x1f};
 } -maskdata $filemask
 
-image create bitmap file_statechange -background white -foreground green -data {
+image create bitmap file_statechange -background white -foreground $color_green -data {
 #define file_statechange_width 14
 #define file_statechange_height 15
 static unsigned char file_statechange_bits[] = {
@@ -2101,7 +2114,7 @@ set all_icons(T$ui_index)   file_statechange
 
 set all_icons(_$ui_workdir) file_plain
 set all_icons(M$ui_workdir) file_mod
-set all_icons(D$ui_workdir) file_question
+set all_icons(D$ui_workdir) file_removed
 set all_icons(U$ui_workdir) file_merge
 set all_icons(O$ui_workdir) file_plain
 set all_icons(T$ui_workdir) file_statechange
@@ -3628,29 +3641,32 @@ foreach {n c} {0 black 1 red4 2 green4 3 yellow4 4 blue4 5 magenta4 6 cyan4 7 gr
 $ui_diff tag configure clr1 -font font_diffbold
 $ui_diff tag configure clr4 -underline 1
 
-$ui_diff tag conf d_info -foreground blue -font font_diffbold
-$ui_diff tag conf d_rescan -foreground blue -underline 1 -font font_diffbold
+$ui_diff tag conf d_info -foreground $color_cyan -font font_diffbold
+$ui_diff tag conf d_rescan -foreground $color_cyan -underline 1 -font font_diffbold
 $ui_diff tag bind d_rescan <Button-1> { clear_diff; rescan ui_ready 0 }
 
 $ui_diff tag conf d_cr -elide true
-$ui_diff tag conf d_@ -font font_diffbold
-$ui_diff tag conf d_+ -foreground {#00a000}
-$ui_diff tag conf d_- -foreground red
+$ui_diff tag conf d_@ \
+	-foreground $color_black \
+	-background $color_purple
 
-$ui_diff tag conf d_++ -foreground {#00a000}
-$ui_diff tag conf d_-- -foreground red
+$ui_diff tag conf d_+ -foreground $color_green
+$ui_diff tag conf d_- -foreground $color_red
+
+$ui_diff tag conf d_++ -foreground $color_green
+$ui_diff tag conf d_-- -foreground $color_red
 $ui_diff tag conf d_+s \
-	-foreground {#00a000} \
-	-background {#e2effa}
+	-foreground $color_black \
+	-background $color_green_bright
 $ui_diff tag conf d_-s \
-	-foreground red \
-	-background {#e2effa}
+	-foreground black \
+	-background $color_cyan_bright
 $ui_diff tag conf d_s+ \
-	-foreground {#00a000} \
-	-background ivory1
+	-foreground $color_black \
+	-background $color_green_bright
 $ui_diff tag conf d_s- \
-	-foreground red \
-	-background ivory1
+	-foreground $color_black \
+	-background $color_red
 
 $ui_diff tag conf d< \
 	-foreground orange \
