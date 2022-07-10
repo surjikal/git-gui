@@ -3265,7 +3265,7 @@ ${NS}::label .branch.cb \
 	-justify left
 pack .branch.l1 -side left
 pack .branch.cb -side left -fill x
-pack .branch -side top -fill x
+pack .branch -side top -fill x -padx 8 -pady 8
 
 # -- Main Window Layout
 #
