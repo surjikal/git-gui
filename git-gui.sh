@@ -1379,6 +1379,12 @@ set last_revert_enc {}
 set nullid "0000000000000000000000000000000000000000"
 set nullid2 "0000000000000000000000000000000000000001"
 
+if {[is_config_true gui.displayuntracked]} {
+	set display_untracked 1
+} else {
+	set display_untracked 0
+}
+
 ######################################################################
 ##
 ## task management
@@ -1530,7 +1536,7 @@ proc have_info_exclude {} {
 }
 
 proc rescan_stage2 {fd after} {
-	global rescan_active buf_rdi buf_rdf buf_rlo
+	global rescan_active buf_rdi buf_rdf buf_rlo display_untracked
 
 	if {$fd ne {}} {
 		read $fd
@@ -1570,7 +1576,7 @@ proc rescan_stage2 {fd after} {
 	fileevent $fd_di readable [list read_diff_index $fd_di $after]
 	fileevent $fd_df readable [list read_diff_files $fd_df $after]
 
-	if {[is_config_true gui.displayuntracked]} {
+	if {$display_untracked == 1} {
 		set fd_lo [eval git_read ls-files --others -z $ls_others]
 		fconfigure $fd_lo -blocking 0 -translation binary -encoding binary
 		fileevent $fd_lo readable [list read_ls_others $fd_lo $after]
@@ -2719,6 +2725,16 @@ proc focus_widget {widget} {
 	}
 }
 
+proc toggle_display_untracked {} {
+	global display_untracked
+	if {$display_untracked} {
+		set display_untracked 0
+	} else {
+		set display_untracked 1
+	}
+	do_rescan
+}
+
 proc toggle_commit_type {} {
 	global commit_type_is_amend
 	set commit_type_is_amend [expr !$commit_type_is_amend]
@@ -2919,6 +2935,15 @@ proc commit_btn_caption {} {
 
 if {[is_enabled multicommit] || [is_enabled singlecommit]} {
 	menu .mbar.commit
+
+	.mbar.commit add checkbutton \
+		-label [mc "Display Untracked"] \
+		-accelerator $M1T-G \
+		-variable display_untracked \
+		-command toggle_display_untracked
+	lappend disable_on_lock \
+		[list .mbar.commit entryconf [.mbar.commit index last] -state]
+	.mbar.commit add separator
 
 	if {![is_enabled nocommit]} {
 		.mbar.commit add checkbutton \
@@ -3254,17 +3279,22 @@ default {
 # -- Branch Control
 #
 ${NS}::frame .branch
-if {!$use_ttk} {.branch configure -borderwidth 1 -relief sunken}
-${NS}::label .branch.l1 \
-	-text [mc "Current Branch:"] \
-	-anchor w \
-	-justify left
+# if {!$use_ttk} {.branch configure -borderwidth 1 -relief sunken}
 ${NS}::label .branch.cb \
 	-textvariable current_branch \
 	-anchor w \
-	-justify left
-pack .branch.l1 -side left
-pack .branch.cb -side left -fill x
+	-justify right
+
+${NS}::checkbutton .branch.r1 \
+	-text [mc "Display Untracked"] \
+	-variable display_untracked \
+	-command toggle_display_untracked
+lappend disable_on_lock \
+	[list .branch.r1 conf -state]
+
+# pack .branch.l1 -side right
+pack .branch.r1 -side left -fill x
+pack .branch.cb -side right -fill x
 pack .branch -side top -fill x -padx 8 -pady 8
 
 # -- Main Window Layout
@@ -4002,6 +4032,8 @@ bind .   <$M1B-Key-t> { toggle_or_diff toggle %W }
 bind .   <$M1B-Key-T> { toggle_or_diff toggle %W }
 bind .   <$M1B-Key-u> { toggle_or_diff toggle %W }
 bind .   <$M1B-Key-U> { toggle_or_diff toggle %W }
+bind .   <$M1B-Key-G> toggle_display_untracked
+bind .   <$M1B-Key-g> toggle_display_untracked
 bind .   <$M1B-Key-j> do_revert_selection
 bind .   <$M1B-Key-J> do_revert_selection
 bind .   <$M1B-Key-i> do_add_all
