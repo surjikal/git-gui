@@ -1363,6 +1363,11 @@ set last_revert_enc {}
 set nullid "0000000000000000000000000000000000000000"
 set nullid2 "0000000000000000000000000000000000000001"
 
+set display_untracked 0
+if {[is_config_true gui.displayuntracked]} {
+	set display_untracked 1
+}
+
 ######################################################################
 ##
 ## task management
@@ -1514,7 +1519,7 @@ proc have_info_exclude {} {
 }
 
 proc rescan_stage2 {fd after} {
-	global rescan_active buf_rdi buf_rdf buf_rlo
+	global rescan_active buf_rdi buf_rdf buf_rlo display_untracked
 
 	if {$fd ne {}} {
 		read $fd
@@ -1554,7 +1559,7 @@ proc rescan_stage2 {fd after} {
 	fileevent $fd_di readable [list read_diff_index $fd_di $after]
 	fileevent $fd_df readable [list read_diff_files $fd_df $after]
 
-	if {[is_config_true gui.displayuntracked]} {
+	if {$display_untracked == 1} {
 		set fd_lo [eval git_read ls-files --others -z $ls_others]
 		fconfigure $fd_lo -blocking 0 -translation binary -encoding binary
 		fileevent $fd_lo readable [list read_ls_others $fd_lo $after]
@@ -1940,6 +1945,7 @@ proc display_all_files {} {
 	global file_states file_lists
 	global last_clicked
 	global files_warning
+	global search_var
 
 	$ui_index conf -state normal
 	$ui_workdir conf -state normal
@@ -1981,9 +1987,11 @@ proc display_all_files {} {
 			set s [string index $m 1]
 		}
 		if {$s ne {_}} {
-			display_all_files_helper $ui_workdir $path \
-				$icon_name $s
-			incr displayed
+			if {$search_var eq "" || [string match [string tolower "*$search_var*"] [string tolower $path]]} {
+				display_all_files_helper $ui_workdir $path \
+					$icon_name $s
+				incr displayed
+			}
 		}
 	}
 
@@ -2703,6 +2711,12 @@ proc focus_widget {widget} {
 	}
 }
 
+proc toggle_display_untracked {} {
+	global display_untracked
+	set display_untracked [expr !$display_untracked]
+	do_rescan
+}
+
 proc toggle_commit_type {} {
 	global commit_type_is_amend
 	set commit_type_is_amend [expr !$commit_type_is_amend]
@@ -2903,6 +2917,16 @@ proc commit_btn_caption {} {
 
 if {[is_enabled multicommit] || [is_enabled singlecommit]} {
 	menu .mbar.commit
+
+	.mbar.commit add checkbutton \
+		-label [mc "Display Untracked"] \
+		-accelerator $M1T-G \
+		-variable display_untracked \
+		-command ui_do_rescan
+
+	lappend disable_on_lock \
+		[list .mbar.commit entryconf [.mbar.commit index last] -state]
+	.mbar.commit add separator
 
 	if {![is_enabled nocommit]} {
 		.mbar.commit add checkbutton \
@@ -3235,21 +3259,60 @@ default {
 }
 }
 
-# -- Branch Control
+# -- Header Control
 #
-${NS}::frame .branch
-if {!$use_ttk} {.branch configure -borderwidth 1 -relief sunken}
-${NS}::label .branch.l1 \
-	-text [mc "Current Branch:"] \
-	-anchor w \
-	-justify left
-${NS}::label .branch.cb \
+${NS}::frame .header
+if {!$use_ttk} {.header configure -borderwidth 1 -relief sunken}
+${NS}::label .header.cb \
 	-textvariable current_branch \
 	-anchor w \
-	-justify left
-pack .branch.l1 -side left
-pack .branch.cb -side left -fill x
-pack .branch -side top -fill x
+	-justify right
+
+${NS}::frame .header.buttons
+
+${NS}::button .header.buttons.rescan -text [mc Rescan] \
+	-command ui_do_rescan
+pack .header.buttons.rescan -side top -fill x
+lappend disable_on_lock \
+	{.header.buttons.rescan conf -state}
+
+${NS}::button .header.buttons.incall -text [mc "Stage Changed"] \
+	-command do_add_all
+pack .header.buttons.incall -side top -fill x
+lappend disable_on_lock \
+	{.header.buttons.incall conf -state}
+
+${NS}::checkbutton .header.buttons.untracked \
+	-text [mc "Display Untracked"] \
+	-variable display_untracked \
+	-command ui_do_rescan
+
+lappend disable_on_lock \
+	[list .header.buttons.untracked conf -state]
+
+
+${NS}::frame .header.search_frame
+pack .header.search_frame -side top -fill x
+
+set search_var ""
+${NS}::entry .header.search_frame.entry -textvariable search_var
+pack .header.search_frame.entry -side left -expand 1 -fill x
+
+proc filter_unstaged_files {varName index op} {
+	display_all_files
+}
+
+# Trigger the filter function when search_var changes
+trace add variable search_var write filter_unstaged_files
+
+
+
+pack .header.buttons -side left -fill x
+pack .header.buttons.rescan -side left -fill x -padx 7
+pack .header.buttons.incall -side left -fill x -padx 7
+pack .header.buttons.untracked -side left -fill x -padx 7
+pack .header.cb -side right -fill x
+pack .header -side top -fill x -padx 7 -pady 7
 
 # -- Main Window Layout
 #
@@ -3365,18 +3428,6 @@ ${NS}::label .vpane.lower.commarea.buttons.l -text {} \
 	-justify left
 pack .vpane.lower.commarea.buttons.l -side top -fill x
 pack .vpane.lower.commarea.buttons -side left -fill y
-
-${NS}::button .vpane.lower.commarea.buttons.rescan -text [mc Rescan] \
-	-command ui_do_rescan
-pack .vpane.lower.commarea.buttons.rescan -side top -fill x
-lappend disable_on_lock \
-	{.vpane.lower.commarea.buttons.rescan conf -state}
-
-${NS}::button .vpane.lower.commarea.buttons.incall -text [mc "Stage Changed"] \
-	-command do_add_all
-pack .vpane.lower.commarea.buttons.incall -side top -fill x
-lappend disable_on_lock \
-	{.vpane.lower.commarea.buttons.incall conf -state}
 
 if {![is_enabled nocommitmsg]} {
 	${NS}::button .vpane.lower.commarea.buttons.signoff -text [mc "Sign Off"] \
@@ -3983,6 +4034,9 @@ bind .   <$M1B-Key-t> { toggle_or_diff toggle %W }
 bind .   <$M1B-Key-T> { toggle_or_diff toggle %W }
 bind .   <$M1B-Key-u> { toggle_or_diff toggle %W }
 bind .   <$M1B-Key-U> { toggle_or_diff toggle %W }
+bind .   <$M1B-Key-f> {focus .header.search_frame.entry}
+bind .   <$M1B-Key-G> toggle_display_untracked
+bind .   <$M1B-Key-g> toggle_display_untracked
 bind .   <$M1B-Key-j> do_revert_selection
 bind .   <$M1B-Key-J> do_revert_selection
 bind .   <$M1B-Key-i> do_add_all
