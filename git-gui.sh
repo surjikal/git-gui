@@ -3432,36 +3432,6 @@ if {$have_tk85} {
 	.vpane paneconfigure .vpane.lower -sticky nsew
 }
 
-# -- Commit Area Buttons
-#
-${NS}::frame .vpane.lower.commarea.buttons
-${NS}::label .vpane.lower.commarea.buttons.l -text {} \
-	-anchor w \
-	-justify left
-pack .vpane.lower.commarea.buttons.l -side top -fill x
-pack .vpane.lower.commarea.buttons -side left -fill y
-
-if {![is_enabled nocommitmsg]} {
-	${NS}::button .vpane.lower.commarea.buttons.signoff -text [mc "Sign Off"] \
-		-command do_signoff
-	pack .vpane.lower.commarea.buttons.signoff -side top -fill x
-}
-
-${NS}::button .vpane.lower.commarea.buttons.commit \
-	-text [commit_btn_caption] \
-	-default active \
-	-command do_commit
-
-pack .vpane.lower.commarea.buttons.commit -side top -fill x
-lappend disable_on_lock \
-	{.vpane.lower.commarea.buttons.commit conf -state}
-
-if {![is_enabled nocommit] && ![is_enabled nopushbutton]} {
-	${NS}::button .vpane.lower.commarea.buttons.push -text [mc Push] \
-		-command do_push_anywhere
-	pack .vpane.lower.commarea.buttons.push -side top -fill x
-}
-
 # -- Commit Message Buffer
 #
 ${NS}::frame .vpane.lower.commarea.buffer
