@@ -3479,7 +3479,7 @@ ttext $ui_comm \
 	-takefocus 1 \
 	-highlightthickness 1 \
 	-relief sunken \
-	-width $repo_config(gui.commitmsgwidth) -height 9 -wrap none \
+	-width $repo_config(gui.commitmsgwidth) -height 15 -wrap none \
 	-font font_diff \
 	-xscrollcommand {.vpane.lower.commarea.buffer.frame.sbx set} \
 	-yscrollcommand {.vpane.lower.commarea.buffer.frame.sby set}
@@ -3493,7 +3493,7 @@ ${NS}::scrollbar .vpane.lower.commarea.buffer.frame.sby \
 pack .vpane.lower.commarea.buffer.frame.sbx -side bottom -fill x
 pack .vpane.lower.commarea.buffer.frame.sby -side right -fill y
 pack $ui_comm -side left -fill y
-pack .vpane.lower.commarea.buffer.header -side top -fill x
+pack .vpane.lower.commarea.buffer.header -side top -fill x -pady 7
 pack .vpane.lower.commarea.buffer.frame -side left -fill y
 pack .vpane.lower.commarea.buffer -side left -fill y -padx 7 -pady 0
 
