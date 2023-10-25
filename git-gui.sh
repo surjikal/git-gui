@@ -304,6 +304,7 @@ set color_grey         {#333333}
 set color_black        {#000000}
 
 
+
 set _trace [lsearch -exact $argv --trace]
 if {$_trace >= 0} {
 	set argv [lreplace $argv $_trace $_trace]
@@ -2752,11 +2753,7 @@ proc hotkey_apply_or_revert_lines {revert} {
 
 proc toggle_display_untracked {} {
 	global display_untracked
-	if {$display_untracked} {
-		set display_untracked 0
-	} else {
-		set display_untracked 1
-	}
+	set display_untracked [expr !$display_untracked]
 	do_rescan
 }
 
@@ -2965,7 +2962,8 @@ if {[is_enabled multicommit] || [is_enabled singlecommit]} {
 		-label [mc "Display Untracked"] \
 		-accelerator $M1T-G \
 		-variable display_untracked \
-		-command toggle_display_untracked
+		-command ui_do_rescan
+
 	lappend disable_on_lock \
 		[list .mbar.commit entryconf [.mbar.commit index last] -state]
 	.mbar.commit add separator
@@ -3327,7 +3325,7 @@ lappend disable_on_lock \
 ${NS}::checkbutton .header.buttons.untracked \
 	-text [mc "Display Untracked"] \
 	-variable display_untracked \
-	-command toggle_display_untracked
+	-command ui_do_rescan
 
 lappend disable_on_lock \
 	[list .header.buttons.untracked conf -state]
