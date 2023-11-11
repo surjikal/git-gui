@@ -1988,9 +1988,33 @@ proc display_all_files {} {
 	set file_lists($ui_index) [list]
 	set file_lists($ui_workdir) [list]
 
+	array set file_mod_times {}
+
+	# Populate file_mod_times with modified times
+	foreach path [array names file_states] {
+		if {[catch {set mod_time [file mtime $path]}]} {
+			set mod_time 0  # Default value if mtime fails
+		}
+		set file_mod_times($path) $mod_time
+	}
+
+	# Create a list of sublists for sorting
+	set files_with_times [list]
+	foreach path [array names file_mod_times] {
+		lappend files_with_times [list $path $file_mod_times($path)]
+	}
+
+	# Now sort the files by modified time
+	set sorted_files [lsort -integer -decreasing -index 1 $files_with_times]
+
 	set to_display [lsort [array names file_states]]
+
 	set display_limit [get_config gui.maxfilesdisplayed]
 	set displayed 0
+
+	# foreach file_with_time $sorted_files {
+	# 	set path [lindex $file_with_time 0]
+	# }
 	foreach path $to_display {
 		set s $file_states($path)
 		set m [lindex $s 0]
@@ -2001,7 +2025,7 @@ proc display_all_files {} {
 				# do not repeatedly warn:
 				set files_warning 1
 				info_popup [mc "Display limit (gui.maxfilesdisplayed = %s) reached, not showing all %s files." \
-					$display_limit [llength $to_display]]
+					$display_limit [llength $sorted_files]]
 			}
 			continue
 		}
