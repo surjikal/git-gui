@@ -1393,10 +1393,9 @@ set last_revert_enc {}
 set nullid "0000000000000000000000000000000000000000"
 set nullid2 "0000000000000000000000000000000000000001"
 
+set display_untracked 0
 if {[is_config_true gui.displayuntracked]} {
 	set display_untracked 1
-} else {
-	set display_untracked 0
 }
 
 ######################################################################
