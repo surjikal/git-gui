@@ -601,7 +601,7 @@ proc _open_stdout_stderr {cmd} {
 			set fd [open [concat [list | ] $cmd] r]
 		} err]} {
 		if {   [lindex $cmd end] eq {2>@1}
-		    && $err eq {can not find channel named "1"}
+			&& $err eq {can not find channel named "1"}
 			} {
 			# Older versions of Tcl 8.4 don't have this 2>@1 IO
 			# redirect operator.  Fallback to |& cat for those.
@@ -756,7 +756,7 @@ proc rmsel_tag {text} {
 # Causes git-gui to crash on macOS 13 beta
 # when opening it from within a repository directory
 if {![is_MacOSX]} {
-    wm withdraw .
+	wm withdraw .
 }
 
 set root_exists 0
@@ -1198,13 +1198,13 @@ proc load_config {include_global} {
 
 disable_option nopushbutton
 for {set i 0} {$i < [llength $argv]} {incr i} {
-    set a [lindex $argv $i]
-    switch -- $a {
-    --nopushbutton {
-        enable_option nopushbutton
+	set a [lindex $argv $i]
+	switch -- $a {
+	--nopushbutton {
+		enable_option nopushbutton
 		set argv [lreplace $argv $i $i]
-    }
-    }
+	}
+	}
 }
 
 if {[regexp {^git-(.+)$} [file tail $argv0] _junk subcommand]} {
@@ -2538,7 +2538,7 @@ proc select_first_diff {after} {
 	global ui_workdir
 
 	if {[find_next_diff $ui_workdir {} 1 {^_?U}] ||
-	    [find_next_diff $ui_workdir {} 1 {[^O]$}]} {
+		[find_next_diff $ui_workdir {} 1 {[^O]$}]} {
 		next_diff $after
 	} else {
 		uplevel #0 $after
@@ -3198,7 +3198,7 @@ proc normalize_relpath {path} {
 	foreach item [file split $path] {
 		if {$item eq {.}} continue
 		if {$item eq {..} && [llength $elements] > 0
-		    && [lindex $elements end] ne {..}} {
+			&& [lindex $elements end] ne {..}} {
 			set elements [lrange $elements 0 end-1]
 			continue
 		}
