@@ -1,4 +1,4 @@
-# Git GUI - A graphical user interface for Git - SURJ EDITION
+# Git GUI - SURJ EDITION
 
 <img width="1358" alt="Screenshot of git-gui" src="https://github.com/surjikal/git-gui/assets/339168/215052d6-496c-4c19-92be-47b45aeb1cef">
 
