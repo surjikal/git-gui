@@ -4049,6 +4049,8 @@ if {[is_enabled transport]} {
 }
 
 bind . <$M1B-Key-f> {focus .header.search_frame.entry}
+bind . <$M1B-Key-k> {do_gitk --all}
+
 bind .   <Key-F5>     ui_do_rescan
 bind .   <$M1B-Key-r> ui_do_rescan
 bind .   <$M1B-Key-R> ui_do_rescan
