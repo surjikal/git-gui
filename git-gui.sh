@@ -1976,6 +1976,7 @@ proc display_all_files {} {
 	global file_states file_lists
 	global last_clicked
 	global files_warning
+	global search_var
 
 	$ui_index conf -state normal
 	$ui_workdir conf -state normal
@@ -2017,9 +2018,11 @@ proc display_all_files {} {
 			set s [string index $m 1]
 		}
 		if {$s ne {_}} {
-			display_all_files_helper $ui_workdir $path \
-				$icon_name $s
-			incr displayed
+			if {$search_var eq "" || [string match "*$search_var*" $path]} {
+				display_all_files_helper $ui_workdir $path \
+					$icon_name $s
+				incr displayed
+			}
 		}
 	}
 
@@ -3330,6 +3333,23 @@ ${NS}::checkbutton .header.buttons.untracked \
 lappend disable_on_lock \
 	[list .header.buttons.untracked conf -state]
 
+
+${NS}::frame .header.search_frame
+pack .header.search_frame -side top -fill x
+
+set search_var ""
+${NS}::entry .header.search_frame.entry -textvariable search_var
+pack .header.search_frame.entry -side left -expand 1 -fill x
+
+proc filter_unstaged_files {varName index op} {
+	display_all_files
+}
+
+# Trigger the filter function when search_var changes
+trace add variable search_var write filter_unstaged_files
+
+
+
 pack .header.buttons -side left -fill x
 pack .header.buttons.rescan -side left -fill x -padx 7
 pack .header.buttons.incall -side left -fill x -padx 7
@@ -4028,6 +4048,7 @@ if {[is_enabled transport]} {
 	bind . <$M1B-Key-P> do_push_anywhere
 }
 
+bind . <$M1B-Key-f> {focus .header.search_frame.entry}
 bind .   <Key-F5>     ui_do_rescan
 bind .   <$M1B-Key-r> ui_do_rescan
 bind .   <$M1B-Key-R> ui_do_rescan
