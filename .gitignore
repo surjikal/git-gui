@@ -6,3 +6,4 @@ GIT-VERSION-FILE
 GIT-GUI-VARS
 git-gui
 lib/tclIndex
+**/.config/git/gitk
