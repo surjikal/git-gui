@@ -1184,13 +1184,13 @@ proc load_config {include_global} {
 
 disable_option nopushbutton
 for {set i 0} {$i < [llength $argv]} {incr i} {
-    set a [lindex $argv $i]
-    switch -- $a {
-    --nopushbutton {
-        enable_option nopushbutton
+	set a [lindex $argv $i]
+	switch -- $a {
+	--nopushbutton {
+		enable_option nopushbutton
 		set argv [lreplace $argv $i $i]
-    }
-    }
+	}
+	}
 }
 
 if {[regexp {^git-(.+)$} [file tail $argv0] _junk subcommand]} {
