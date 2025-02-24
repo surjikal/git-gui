@@ -1,6 +1,6 @@
 # Git GUI - SURJ EDITION
 
-<img width="1358" alt="Screenshot of git-gui" src="https://github.com/surjikal/git-gui/assets/339168/215052d6-496c-4c19-92be-47b45aeb1cef">
+![image](https://github.com/user-attachments/assets/461691fc-0ffe-4bc5-9b1a-56f5f6425219)
 
 ---
 
